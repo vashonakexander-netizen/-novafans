@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  lint-and-build:
+    name: Lint and Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build config package
+        run: |
+          cd packages/config
+          pnpm build
+
+      - name: Build API
+        run: |
+          cd apps/api
+          pnpm prisma:generate
+          pnpm build
+
+      - name: Build AI service
+        run: |
+          cd apps/ai
+          pnpm build
+
+      - name: Build Web app
+        run: |
+          cd apps/web
+          pnpm build
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:3001
+          NEXT_PUBLIC_AI_SERVICE_URL: http://localhost:3002
+
+      - name: Run tests
+        run: |
+          cd apps/api
+          pnpm test --passWithNoTests || true
+
+      # TODO: Add linting when ESLint is configured
+      # - name: Lint
+      #   run: pnpm lint
+

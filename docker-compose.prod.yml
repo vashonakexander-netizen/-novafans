@@ -1,0 +1,108 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-novafans}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-novafans}
+      POSTGRES_DB: ${POSTGRES_DB:-novafans}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U novafans"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # TODO: In production, use managed database (AWS RDS, Railway Postgres, etc.)
+    # Remove this service and set DATABASE_URL to managed instance
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # TODO: In production, use managed Redis (AWS ElastiCache, Railway Redis, etc.)
+    # Remove this service and set REDIS_URL to managed instance
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      API_BASE_URL: ${API_BASE_URL:-http://localhost:3001}
+      DATABASE_URL: ${DATABASE_URL}
+      POSTGRES_URL: ${POSTGRES_URL:-${DATABASE_URL}}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:3000}
+      AI_SERVICE_URL: ${AI_SERVICE_URL:-http://ai:3002}
+      STORAGE_BASE_URL: ${STORAGE_BASE_URL:-${API_BASE_URL:-http://localhost:3001}}
+      UPLOADS_DIR: ./uploads
+    ports:
+      - "3001:3001"
+    volumes:
+      - api_uploads:/app/apps/api/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    # TODO: For production deployment:
+    # - Use managed database (set DATABASE_URL)
+    # - Use managed Redis (set REDIS_URL)
+    # - Use S3/BunnyCDN for media (set STORAGE_BASE_URL to CDN URL)
+    # - Remove uploads volume, use cloud storage
+
+  ai:
+    build:
+      context: .
+      dockerfile: apps/ai/Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3002
+      AI_SERVICE_URL: ${AI_SERVICE_URL:-http://localhost:3002}
+    ports:
+      - "3002:3002"
+    depends_on:
+      - api
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+        NEXT_PUBLIC_AI_SERVICE_URL: ${NEXT_PUBLIC_AI_SERVICE_URL:-http://localhost:3002}
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+      NEXT_PUBLIC_AI_SERVICE_URL: ${NEXT_PUBLIC_AI_SERVICE_URL:-http://localhost:3002}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+      - ai
+    # TODO: For Vercel deployment:
+    # - Deploy separately on Vercel
+    # - Set NEXT_PUBLIC_* env vars in Vercel dashboard
+    # - Remove this service from docker-compose
+
+volumes:
+  postgres_data:
+  redis_data:
+  api_uploads:
+    # TODO: For production, use persistent volumes or cloud storage
+

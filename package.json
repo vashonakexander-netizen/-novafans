@@ -1,0 +1,21 @@
+{
+  "name": "novafans",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "validate:local": "./scripts/validation/validate-local.sh",
+    "validate:build": "./scripts/validation/validate-build-only.sh",
+    "validate:crypto": "./scripts/crypto-validation/run-full-validation.sh"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}

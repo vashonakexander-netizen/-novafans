@@ -1,0 +1,23 @@
+{
+  "name": "@novafans/config",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "files": [
+    "src",
+    "eslint",
+    "typescript",
+    "prettier"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint src"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.9",
+    "typescript": "^5.3.3"
+  }
+}
+
+
