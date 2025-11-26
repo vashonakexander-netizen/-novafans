@@ -387,3 +387,4 @@ The codebase includes **fake integrations** that can be replaced:
 
 [Your Support Contact]
 
+# -novafans
