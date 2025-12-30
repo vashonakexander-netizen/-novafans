@@ -10,3 +10,4 @@ export interface IStorageAdapter {
   deleteFile(key: string): Promise<void>;
 }
 
+

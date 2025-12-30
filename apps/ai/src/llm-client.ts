@@ -93,3 +93,4 @@ function generateFallbackReply(messages: { role: string; content: string }[]): s
   return "Thanks for your message! I'll get back to you soon. ❤️";
 }
 
+

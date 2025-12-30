@@ -1,12 +1,10 @@
 {
-  "buildCommand": "cd apps/web && pnpm install && pnpm build",
+  "buildCommand": "cd ../.. && pnpm install && pnpm build --filter=web",
   "outputDirectory": "apps/web/.next",
   "framework": "nextjs",
-  "installCommand": "pnpm install",
-  "devCommand": "cd apps/web && pnpm dev",
-  "env": {
-    "NEXT_PUBLIC_API_URL": "@next_public_api_url",
-    "NEXT_PUBLIC_AI_SERVICE_URL": "@next_public_ai_service_url"
-  }
+  "installCommand": "cd ../.. && pnpm install",
+  "devCommand": "cd ../.. && pnpm dev --filter=web",
+  "rootDirectory": "apps/web"
 }
+
 

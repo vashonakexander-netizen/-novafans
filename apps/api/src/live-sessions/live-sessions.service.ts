@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from "@nestjs/common";
 import { PrismaService } from "../common/prisma/prisma.service";
 import { TransactionsService } from "../transactions/transactions.service";
-import { CreateLiveSessionDto, SendLiveTipDto } from "./dto";
+import { CreateLiveSessionDto, SendLiveTipDto, PurchaseTicketDto } from "./dto";
 import { LiveSessionStatus, LiveAccessType } from "@prisma/client";
 import { CryptoGatewayService } from "../crypto-gateway/crypto-gateway.service";
 import { getCryptoConfig } from "@novafans/config";
@@ -273,9 +273,20 @@ export class LiveSessionsService {
         }
       }
 
-      // TODO: Check ticket purchase for TICKETED shows
+      // Check ticket purchase for TICKETED shows
       if (session.accessType === LiveAccessType.TICKETED) {
-        // For now, allow access (TODO: implement ticket purchase check)
+        const ticketPurchase = await this.prisma.liveTicketPurchase.findUnique({
+          where: {
+            liveSessionId_fanId: {
+              liveSessionId: sessionId,
+              fanId: userId,
+            },
+          },
+        });
+
+        if (!ticketPurchase || ticketPurchase.status !== "COMPLETED") {
+          throw new ForbiddenException("Ticket purchase required to view this live show");
+        }
       }
     }
 
@@ -288,6 +299,170 @@ export class LiveSessionsService {
     }
 
     return session;
+  }
+
+  async purchaseTicket(sessionId: string, fanId: string, dto: PurchaseTicketDto) {
+    const session = await this.prisma.liveSession.findUnique({
+      where: { id: sessionId },
+    });
+
+    if (!session) {
+      throw new NotFoundException("Live session not found");
+    }
+
+    if (session.accessType !== LiveAccessType.TICKETED) {
+      throw new BadRequestException("This session is not ticketed");
+    }
+
+    if (!session.ticketPrice) {
+      throw new BadRequestException("Ticket price not set for this session");
+    }
+
+    // Check if already purchased
+    const existingPurchase = await this.prisma.liveTicketPurchase.findUnique({
+      where: {
+        liveSessionId_fanId: {
+          liveSessionId: sessionId,
+          fanId,
+        },
+      },
+    });
+
+    if (existingPurchase && existingPurchase.status === "COMPLETED") {
+      throw new BadRequestException("Ticket already purchased");
+    }
+
+    const ticketPrice = session.ticketPrice.toNumber();
+    const cryptoConfig = getCryptoConfig();
+    const currency = cryptoConfig.defaultCurrency;
+
+    // Validate minimum amount
+    if (ticketPrice < cryptoConfig.minAmount) {
+      throw new BadRequestException(`Ticket price must be at least ${cryptoConfig.minAmount} ${currency}`);
+    }
+
+    // If in fake mode, process instantly
+    if (cryptoConfig.provider === "fake" || !cryptoConfig.apiKey) {
+      // Instant ticket purchase (backward compatible)
+      const transaction = await this.transactionsService.create({
+        userId: fanId,
+        creatorId: session.creatorId,
+        type: "TIP", // Using TIP type for now, could add TICKET type later
+        amountGross: ticketPrice,
+        platformFee: ticketPrice * 0.2,
+        amountNetCreator: ticketPrice * 0.8,
+        source: "CRYPTO",
+        status: "COMPLETED",
+      });
+
+      // Update creator balance
+      await this.transactionsService.complete(transaction.id);
+
+      // Create or update ticket purchase
+      const ticketPurchase = await this.prisma.liveTicketPurchase.upsert({
+        where: {
+          liveSessionId_fanId: {
+            liveSessionId: sessionId,
+            fanId,
+          },
+        },
+        update: {
+          status: "COMPLETED",
+          transactionId: transaction.id,
+        },
+        create: {
+          liveSessionId: sessionId,
+          fanId,
+          amount: ticketPrice,
+          status: "COMPLETED",
+          transactionId: transaction.id,
+        },
+        include: {
+          fan: {
+            select: {
+              id: true,
+              username: true,
+              displayName: true,
+            },
+          },
+        },
+      });
+
+      return ticketPurchase;
+    }
+
+    // Real crypto gateway mode: create invoice and return payment URL
+    const gatewayResult = await this.cryptoGateway.createInvoice({
+      userId: fanId,
+      creatorId: session.creatorId,
+      amount: ticketPrice,
+      currency,
+      type: "TIP", // Using TIP type for now
+      metadata: {
+        liveSessionId: sessionId,
+        fanId,
+        creatorId: session.creatorId,
+        purchaseType: "TICKET",
+      },
+    });
+
+    // Create crypto invoice record
+    const invoice = await this.prisma.cryptoInvoice.create({
+      data: {
+        fanId,
+        creatorId: session.creatorId,
+        amount: ticketPrice,
+        currency,
+        status: "PENDING",
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
+        processorInvoiceId: gatewayResult.providerInvoiceId || gatewayResult.invoiceId,
+      },
+    });
+
+    // Create pending transaction
+    const transaction = await this.transactionsService.create({
+      userId: fanId,
+      creatorId: session.creatorId,
+      type: "TIP", // Using TIP type for now
+      amountGross: ticketPrice,
+      platformFee: ticketPrice * 0.2,
+      amountNetCreator: ticketPrice * 0.8,
+      source: "CRYPTO",
+      status: "PENDING",
+      externalTxnId: invoice.id,
+    });
+
+    // Create or update pending ticket purchase
+    const ticketPurchase = await this.prisma.liveTicketPurchase.upsert({
+      where: {
+        liveSessionId_fanId: {
+          liveSessionId: sessionId,
+          fanId,
+        },
+      },
+      update: {
+        status: "PENDING",
+        transactionId: transaction.id,
+      },
+      create: {
+        liveSessionId: sessionId,
+        fanId,
+        amount: ticketPrice,
+        status: "PENDING",
+        transactionId: transaction.id,
+      },
+    });
+
+    // Return payment URL for frontend to redirect user
+    return {
+      ticketPurchaseId: ticketPurchase.id,
+      invoiceId: invoice.id,
+      paymentUrl: gatewayResult.paymentUrl,
+      status: "PENDING",
+      amount: ticketPrice,
+      currency,
+      message: "Redirect user to paymentUrl to complete ticket purchase",
+    };
   }
 
   async sendTip(sessionId: string, fanId: string, dto: SendLiveTipDto) {

@@ -168,6 +168,7 @@ model User {
   messageUnlocks  MessageUnlock[]
   liveSessions    LiveSession[]
   liveTips        LiveTip[]
+  ticketPurchases LiveTicketPurchase[]
 
   @@index([username])
   @@index([email])
@@ -532,6 +533,7 @@ model LiveSession {
 
   creator User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   tips    LiveTip[]
+  ticketPurchases LiveTicketPurchase[]
 
   @@index([creatorId])
   @@index([status])
@@ -551,5 +553,24 @@ model LiveTip {
 
   @@index([liveSessionId])
   @@index([fanId])
+}
+
+model LiveTicketPurchase {
+  id            String   @id @default(cuid())
+  liveSessionId String
+  fanId         String
+  transactionId String?  // Link to transaction if paid via crypto
+  amount        Decimal
+  status        String   @default("COMPLETED") // COMPLETED, PENDING, REFUNDED
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  session     LiveSession @relation(fields: [liveSessionId], references: [id], onDelete: Cascade)
+  fan         User        @relation(fields: [fanId], references: [id], onDelete: Cascade)
+
+  @@unique([liveSessionId, fanId]) // One ticket per user per session
+  @@index([liveSessionId])
+  @@index([fanId])
+  @@index([status])
 }
 

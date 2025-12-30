@@ -127,16 +127,32 @@ export class PaymentsController {
         } else if (invoiceType === "TIP") {
           // Extract liveSessionId from metadata
           const liveSessionId = webhookResult.metadata?.liveSessionId;
+          const purchaseType = webhookResult.metadata?.purchaseType;
+          
           if (liveSessionId) {
-            // Create LiveTip entry
-            await this.prisma.liveTip.create({
-              data: {
-                liveSessionId,
-                fanId: invoice.fanId,
-                amount,
-                message: webhookResult.metadata?.message,
-              },
-            });
+            if (purchaseType === "TICKET") {
+              // Update ticket purchase status
+              await this.prisma.liveTicketPurchase.updateMany({
+                where: {
+                  liveSessionId,
+                  fanId: invoice.fanId,
+                  transactionId: transaction!.id,
+                },
+                data: {
+                  status: "COMPLETED",
+                },
+              });
+            } else {
+              // Create LiveTip entry
+              await this.prisma.liveTip.create({
+                data: {
+                  liveSessionId,
+                  fanId: invoice.fanId,
+                  amount,
+                  message: webhookResult.metadata?.message,
+                },
+              });
+            }
           }
         }
 

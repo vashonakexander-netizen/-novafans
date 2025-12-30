@@ -85,3 +85,4 @@ echo ""
 log_info "✅ Environment verification complete"
 log_info "   Fake mode is configured correctly"
 
+

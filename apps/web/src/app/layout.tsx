@@ -5,8 +5,8 @@ import { Footer } from "@/components/footer";
 import { PageViewTracker } from "@/components/page-view-tracker";
 
 export const metadata: Metadata = {
-  title: "NovaFans - Creator Subscription Platform | Get Paid by Fans",
-  description: "Monetize your content with subscriptions, tips, and paid posts. Support your favorite creators and unlock exclusive content. Secure crypto and card payments.",
+  title: "NovaFans - Support Your Favorite Creators | Exclusive Content & Live Shows",
+  description: "Subscribe to exclusive content, chat directly with creators, and unlock premium experiences. Secure payments, live sessions, and direct messaging.",
 };
 
 export default function RootLayout({

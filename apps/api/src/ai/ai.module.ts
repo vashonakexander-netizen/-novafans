@@ -12,3 +12,4 @@ import { RedisModule } from "../common/redis/redis.module";
 })
 export class AiModule {}
 
+

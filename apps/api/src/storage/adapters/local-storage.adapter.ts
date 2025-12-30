@@ -70,3 +70,4 @@ export class LocalStorageAdapter implements IStorageAdapter {
   }
 }
 
+

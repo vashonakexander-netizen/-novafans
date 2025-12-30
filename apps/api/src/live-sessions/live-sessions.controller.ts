@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Param, Body, UseGuards } from "@nestjs/common";
 import { RateLimit, RateLimitGuard } from "../common/rate-limit/rate-limit.guard";
 import { LiveSessionsService } from "./live-sessions.service";
-import { CreateLiveSessionDto, SendLiveTipDto } from "./dto";
+import { CreateLiveSessionDto, SendLiveTipDto, PurchaseTicketDto } from "./dto";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { OptionalJwtGuard } from "../common/guards/optional-jwt.guard";
 import { RolesGuard } from "../common/guards/roles.guard";
@@ -44,6 +44,13 @@ export class LiveSessionsController {
   @Roles(UserRole.CREATOR)
   async endSession(@Param("id") id: string, @CurrentUser() user: any) {
     return this.liveSessionsService.endSession(id, user.id);
+  }
+
+  @Post(":id/purchase-ticket")
+  @UseGuards(JwtAuthGuard, RateLimitGuard)
+  @RateLimit({ maxRequests: 10, windowMs: 60 * 1000 }) // 10 per minute
+  async purchaseTicket(@Param("id") id: string, @CurrentUser() user: any, @Body() dto: PurchaseTicketDto) {
+    return this.liveSessionsService.purchaseTicket(id, user.id, dto);
   }
 
   @Post(":id/tips")

@@ -15,3 +15,4 @@ export class CreatePayoutRequestDto {
   payoutDetails?: any; // Wallet address, bank info, etc.
 }
 
+

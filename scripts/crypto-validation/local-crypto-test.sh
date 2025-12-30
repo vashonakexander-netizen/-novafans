@@ -103,3 +103,4 @@ echo ""
 log_info "✅ Local crypto validation script complete"
 log_info "   Run manual tests as described above"
 
+
