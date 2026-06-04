@@ -4,7 +4,7 @@ import { NestExpressApplication } from "@nestjs/platform-express";
 import { join } from "path";
 import * as helmet from "helmet";
 import { AppModule } from "./app.module";
-import { getApiConfig } from "@novafans/config";
+import { getApiConfig } from "@savage-house/config";
 
 async function bootstrap() {
   const config = getApiConfig();

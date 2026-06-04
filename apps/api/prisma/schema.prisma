@@ -14,6 +14,8 @@ enum UserRole {
   FAN
   CREATOR
   ADMIN
+  AGENCY
+  MODEL
 }
 
 enum KycStatus {
@@ -169,10 +171,15 @@ model User {
   liveSessions    LiveSession[]
   liveTips        LiveTip[]
   ticketPurchases LiveTicketPurchase[]
+  agencyClients   AgencyClient[]          @relation("AgencyClients")
+  mediaUploads    AgencyMediaVault[]      @relation("MediaUploads")
+  agencyTemplates AgencyResponseTemplate[] @relation("AgencyTemplates")
+  agencyFans      AgencyFan[]             @relation("AgencyFans")
 
   @@index([username])
   @@index([email])
   @@index([role])
+  @@index([telegramChatId])
 }
 
 model CreatorProfile {
@@ -574,3 +581,257 @@ model LiveTicketPurchase {
   @@index([status])
 }
 
+
+// ─── Agency / CreatorDesk Models ────────────────────────────────────────────
+
+enum AgencyClientStatus {
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
+
+enum MediaVaultStatus {
+  UPLOADED
+  REVIEWED
+  APPROVED
+  SCHEDULED
+}
+
+enum ScheduledPostStatus {
+  DRAFT
+  SCHEDULED
+  POSTED
+  FAILED
+}
+
+enum AgencyMessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum AgencyMessageStatus {
+  UNREAD
+  READ
+  DRAFT_PENDING
+  REPLIED
+}
+
+enum AgencyPlatform {
+  INSTAGRAM
+  REDDIT
+  TWITTER
+  ONLYFANS
+  OTHER
+}
+
+enum AgencyProductType {
+  PHOTO
+  VIDEO
+  BUNDLE
+  PPV
+}
+
+enum AgencySubTier {
+  FREE
+  PREMIUM
+  VIP
+}
+
+// Agency manages multiple clients (creator personas)
+model AgencyClient {
+  id             String              @id @default(cuid())
+  agencyId       String
+  name           String
+  slug           String              @unique
+  bio            String?
+  colorTag       String              @default("#8B5CF6")
+  toneProfile    String?
+  payoutSplit    Float               @default(0.8)
+  platformLinks  Json?
+  avatarUrl      String?
+  status         AgencyClientStatus  @default(ACTIVE)
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  agency         User                @relation("AgencyClients", fields: [agencyId], references: [id], onDelete: Cascade)
+  mediaVault     AgencyMediaVault[]
+  scheduledPosts AgencyScheduledPost[]
+  messages       AgencyMessage[]
+  analyticsEvents AgencyAnalyticsEvent[]
+  products       AgencyProduct[]
+  subscriptions  AgencySubscription[]
+
+  @@index([agencyId])
+  @@index([slug])
+  @@index([status])
+}
+
+model AgencyMediaVault {
+  id          String           @id @default(cuid())
+  clientId    String
+  uploaderId  String
+  fileUrl     String
+  fileType    String
+  thumbnailUrl String?
+  caption     String?
+  tags        String[]
+  status      MediaVaultStatus @default(UPLOADED)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  client      AgencyClient     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  uploader    User             @relation("MediaUploads", fields: [uploaderId], references: [id], onDelete: Cascade)
+  scheduledPosts AgencyScheduledPost[]
+
+  @@index([clientId])
+  @@index([uploaderId])
+  @@index([status])
+}
+
+model AgencyScheduledPost {
+  id          String              @id @default(cuid())
+  clientId    String
+  mediaId     String?
+  platform    AgencyPlatform
+  scheduledAt DateTime
+  caption     String?
+  status      ScheduledPostStatus @default(DRAFT)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  client      AgencyClient        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  media       AgencyMediaVault?   @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+
+  @@index([clientId])
+  @@index([scheduledAt])
+  @@index([status])
+}
+
+model AgencyMessage {
+  id          String                 @id @default(cuid())
+  clientId    String
+  platform    AgencyPlatform
+  fanName     String
+  content     String
+  direction   AgencyMessageDirection @default(INBOUND)
+  status      AgencyMessageStatus    @default(UNREAD)
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+
+  client      AgencyClient           @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  aiDrafts    AgencyAiDraft[]
+
+  @@index([clientId])
+  @@index([status])
+  @@index([direction])
+}
+
+model AgencyAiDraft {
+  id              String        @id @default(cuid())
+  messageId       String
+  draftContent    String
+  confidenceScore Float         @default(0.5)
+  approved        Boolean       @default(false)
+  rejected        Boolean       @default(false)
+  editedContent   String?
+  createdAt       DateTime      @default(now())
+
+  message         AgencyMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+}
+
+model AgencyResponseTemplate {
+  id        String   @id @default(cuid())
+  agencyId  String
+  title     String
+  content   String
+  tags      String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agency    User     @relation("AgencyTemplates", fields: [agencyId], references: [id], onDelete: Cascade)
+
+  @@index([agencyId])
+}
+
+model AgencyProduct {
+  id          String            @id @default(cuid())
+  clientId    String
+  title       String
+  description String?
+  price       Decimal
+  fileUrl     String?
+  type        AgencyProductType @default(PHOTO)
+  isActive    Boolean           @default(true)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  client      AgencyClient      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  orders      AgencyOrder[]
+
+  @@index([clientId])
+}
+
+model AgencyFan {
+  id           String   @id @default(cuid())
+  userId       String?
+  displayName  String
+  email        String?
+  totalSpend   Decimal  @default(0)
+  createdAt    DateTime @default(now())
+
+  user         User?    @relation("AgencyFans", fields: [userId], references: [id], onDelete: SetNull)
+  subscriptions AgencySubscription[]
+  orders        AgencyOrder[]
+
+  @@index([userId])
+  @@index([email])
+}
+
+model AgencySubscription {
+  id                   String         @id @default(cuid())
+  fanId                String
+  clientId             String
+  tier                 AgencySubTier  @default(FREE)
+  status               SubscriptionStatus @default(ACTIVE)
+  stripeSubscriptionId String?
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+
+  fan                  AgencyFan      @relation(fields: [fanId], references: [id], onDelete: Cascade)
+  client               AgencyClient   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([fanId])
+  @@index([clientId])
+  @@index([status])
+}
+
+model AgencyOrder {
+  id              String        @id @default(cuid())
+  fanId           String
+  productId       String
+  amount          Decimal
+  stripePaymentId String?
+  createdAt       DateTime      @default(now())
+
+  fan             AgencyFan     @relation(fields: [fanId], references: [id], onDelete: Cascade)
+  product         AgencyProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([fanId])
+  @@index([productId])
+}
+
+model AgencyAnalyticsEvent {
+  id        String       @id @default(cuid())
+  clientId  String
+  eventType String
+  metadata  Json?
+  createdAt DateTime     @default(now())
+
+  client    AgencyClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
+  @@index([eventType])
+  @@index([createdAt])
+}

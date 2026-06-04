@@ -1,0 +1,162 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import {
+  LayoutDashboard, Users, DollarSign, Settings, ChevronRight,
+  Inbox, Calendar, ImageIcon, BarChart2, LogOut, Zap
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import api from "@/lib/api";
+
+interface Client {
+  id: string;
+  name: string;
+  colorTag: string;
+  slug: string;
+}
+
+const navItems = [
+  { href: "/agency", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { href: "/agency/clients", label: "Clients", icon: Users },
+  { href: "/agency/revenue", label: "Revenue", icon: DollarSign },
+];
+
+const clientNav = [
+  { href: "vault", label: "Vault", icon: ImageIcon },
+  { href: "inbox", label: "Inbox", icon: Inbox },
+  { href: "schedule", label: "Schedule", icon: Calendar },
+  { href: "analytics", label: "Analytics", icon: BarChart2 },
+];
+
+export function AgencySidebar() {
+  const pathname = usePathname();
+  const [clients, setClients] = useState<Client[]>([]);
+  const [activeClientId, setActiveClientId] = useState<string | null>(null);
+
+  useEffect(() => {
+    api.get("/agency/clients").then((r) => setClients(r.data || [])).catch(() => {});
+  }, []);
+
+  // Detect active client from URL
+  useEffect(() => {
+    const match = pathname.match(/\/agency\/clients\/([^/]+)/);
+    if (match) setActiveClientId(match[1]);
+  }, [pathname]);
+
+  const isActive = (href: string, exact = false) =>
+    exact ? pathname === href : pathname.startsWith(href);
+
+  return (
+    <aside className="w-64 border-r border-border bg-card flex flex-col shrink-0">
+      {/* Logo */}
+      <div className="px-4 py-5 border-b border-border">
+        <Link href="/agency" className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+            <Zap className="w-4 h-4 text-white" />
+          </div>
+          <span className="font-bold text-lg text-foreground">NovaFans</span>
+          <Badge variant="secondary" className="text-[10px] py-0 px-1.5">AGENCY</Badge>
+        </Link>
+      </div>
+
+      {/* Main nav */}
+      <nav className="px-3 py-3 space-y-0.5">
+        {navItems.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={cn(
+              "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+              isActive(item.href, item.exact)
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground hover:bg-accent"
+            )}
+          >
+            <item.icon className="w-4 h-4 shrink-0" />
+            {item.label}
+          </Link>
+        ))}
+      </nav>
+
+      <div className="px-3 py-2 border-t border-border">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground px-3 mb-2">
+          Clients
+        </p>
+        <div className="space-y-0.5 max-h-72 overflow-y-auto">
+          {clients.length === 0 && (
+            <p className="px-3 py-2 text-xs text-muted-foreground">No clients yet</p>
+          )}
+          {clients.map((client) => {
+            const isClientActive = pathname.startsWith(`/agency/clients/${client.id}`);
+            return (
+              <div key={client.id}>
+                <Link
+                  href={`/agency/clients/${client.id}`}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors w-full",
+                    isClientActive
+                      ? "bg-secondary text-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                  )}
+                >
+                  <span
+                    className="w-2.5 h-2.5 rounded-full shrink-0"
+                    style={{ backgroundColor: client.colorTag }}
+                  />
+                  <span className="truncate font-medium">{client.name}</span>
+                  {isClientActive && <ChevronRight className="w-3 h-3 ml-auto shrink-0" />}
+                </Link>
+
+                {/* Sub-nav for active client */}
+                {isClientActive && (
+                  <div className="ml-5 mt-0.5 space-y-0.5 border-l border-border pl-3">
+                    {clientNav.map((nav) => {
+                      const href = `/agency/clients/${client.id}/${nav.href}`;
+                      return (
+                        <Link
+                          key={nav.href}
+                          href={href}
+                          className={cn(
+                            "flex items-center gap-2 px-2 py-1.5 rounded-md text-xs transition-colors",
+                            pathname.startsWith(href)
+                              ? "text-foreground font-medium"
+                              : "text-muted-foreground hover:text-foreground"
+                          )}
+                        >
+                          <nav.icon className="w-3 h-3" />
+                          {nav.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <Link
+          href="/agency/clients"
+          className="flex items-center gap-2 px-3 py-2 mt-1 rounded-md text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors w-full"
+        >
+          <span className="text-base leading-none">+</span> Add Client
+        </Link>
+      </div>
+
+      {/* Footer */}
+      <div className="mt-auto border-t border-border px-3 py-3">
+        <Link
+          href="/login"
+          className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+        >
+          <LogOut className="w-4 h-4" />
+          Sign out
+        </Link>
+      </div>
+    </aside>
+  );
+}

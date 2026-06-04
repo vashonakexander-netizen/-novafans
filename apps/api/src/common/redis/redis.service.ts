@@ -6,7 +6,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   private client: Redis;
 
   constructor() {
-    const { redisUrl } = require("@novafans/config").getApiConfig();
+    const { redisUrl } = require("@savage-house/config").getApiConfig();
     this.client = new Redis(redisUrl);
   }
 

@@ -10,7 +10,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private configService: ConfigService,
     private prisma: PrismaService
   ) {
-    const { jwtAccessSecret } = require("@novafans/config").getApiConfig();
+    const { jwtAccessSecret } = require("@savage-house/config").getApiConfig();
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,

@@ -4,7 +4,7 @@ import { TransactionsService } from "../transactions/transactions.service";
 import { CreateLiveSessionDto, SendLiveTipDto, PurchaseTicketDto } from "./dto";
 import { LiveSessionStatus, LiveAccessType } from "@prisma/client";
 import { CryptoGatewayService } from "../crypto-gateway/crypto-gateway.service";
-import { getCryptoConfig } from "@novafans/config";
+import { getCryptoConfig } from "@savage-house/config";
 import { LiveKitService } from "./livekit.service";
 
 @Injectable()

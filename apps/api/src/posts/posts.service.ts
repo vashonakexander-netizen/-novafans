@@ -91,6 +91,35 @@ export class PostsService {
     return this.findOne(postId);
   }
 
+  async findAll(userId?: string) {
+    // Get all published posts that are public
+    const posts = await this.prisma.post.findMany({
+      where: {
+        isDeleted: false,
+        status: PostStatus.PUBLISHED,
+        visibility: PostVisibility.PUBLIC_TEASER,
+      },
+      include: {
+        media: {
+          take: 1, // Just get first media for thumbnail
+        },
+        creator: {
+          select: {
+            id: true,
+            username: true,
+            displayName: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 100, // Limit to 100 most recent
+    });
+
+    return posts;
+  }
+
   async findOne(id: string, userId?: string) {
     const post = await this.prisma.post.findUnique({
       where: { id, isDeleted: false },

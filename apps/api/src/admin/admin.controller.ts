@@ -5,7 +5,7 @@ import { Roles } from "../common/decorators/roles.decorator";
 import { CurrentUser } from "../common/decorators/current-user.decorator";
 import { UserRole } from "@prisma/client";
 import { PrismaService } from "../common/prisma/prisma.service";
-import { getCryptoConfig } from "@novafans/config";
+import { getCryptoConfig } from "@savage-house/config";
 import { readFileSync } from "fs";
 import { join } from "path";
 import { existsSync } from "fs";

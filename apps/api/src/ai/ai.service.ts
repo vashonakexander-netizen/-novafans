@@ -11,7 +11,7 @@ export class AiService implements OnModuleInit {
     private prisma: PrismaService,
     private redis: RedisService
   ) {
-    const { aiServiceUrl } = require("@novafans/config").getApiConfig();
+    const { aiServiceUrl } = require("@savage-house/config").getApiConfig();
     this.aiServiceUrl = aiServiceUrl;
   }
 
@@ -94,7 +94,7 @@ export class AiService implements OnModuleInit {
       });
 
       if (!aiSession) {
-        const aiConfig = require("@novafans/config").getAiConfig();
+        const aiConfig = require("@savage-house/config").getAiConfig();
         aiSession = await this.prisma.aiSession.create({
           data: {
             conversationId: job.conversationId,

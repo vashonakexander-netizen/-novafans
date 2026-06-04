@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
-import { getCryptoConfig } from "@novafans/config";
+import { getCryptoConfig } from "@savage-house/config";
 import { ICryptoGateway, CreateInvoiceParams, CreateInvoiceResult, MapWebhookResult } from "./crypto-gateway.interface";
 import { FakeCryptoGateway } from "./providers/fake-crypto-gateway";
 import { NowPaymentsGateway } from "./providers/nowpayments-gateway";

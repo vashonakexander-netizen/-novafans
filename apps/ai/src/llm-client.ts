@@ -1,4 +1,4 @@
-import { getAiConfig } from "@novafans/config";
+import { getAiConfig } from "@savage-house/config";
 import OpenAI from "openai";
 
 export interface GenerateReplyParams {

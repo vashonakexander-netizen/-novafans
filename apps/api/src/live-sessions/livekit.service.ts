@@ -81,6 +81,7 @@ export class LiveKitService implements OnModuleInit {
     });
 
     token.addGrant({
+      
       room: roomName,
       roomJoin: true,
       canPublish: true,

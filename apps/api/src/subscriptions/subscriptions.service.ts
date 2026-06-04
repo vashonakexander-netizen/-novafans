@@ -3,7 +3,7 @@ import { PrismaService } from "../common/prisma/prisma.service";
 import { TransactionsService } from "../transactions/transactions.service";
 import { CreateCryptoSubscriptionDto } from "./dto";
 import { CryptoGatewayService } from "../crypto-gateway/crypto-gateway.service";
-import { getCryptoConfig } from "@novafans/config";
+import { getCryptoConfig } from "@savage-house/config";
 
 @Injectable()
 export class SubscriptionsService {

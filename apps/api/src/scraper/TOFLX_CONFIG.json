@@ -1,0 +1,30 @@
+{
+  "toflx.com": {
+    "defaultConfig": {
+      "imageSelector": "img[src], img[data-src], img[data-lazy-src], img.media-image, img.gallery-image, img.photo, img.picture, .image img, .photo img, .gallery img",
+      "videoSelector": "video[src], video source[src], video[data-src], .video video, .media video, iframe[src*='youtube'], iframe[src*='vimeo'], iframe[src*='video']",
+      "minImageSize": 100,
+      "useApi": false
+    },
+    "commonSelectors": {
+      "images": [
+        "img[src]",
+        "img[data-src]",
+        "img[data-lazy-src]",
+        "img.gallery-image",
+        "img.media-image",
+        ".gallery img",
+        ".photos img",
+        ".media img"
+      ],
+      "videos": [
+        "video[src]",
+        "video source[src]",
+        ".video video",
+        ".media video",
+        "iframe[src*='youtube']",
+        "iframe[src*='vimeo']"
+      ]
+    }
+  }
+}

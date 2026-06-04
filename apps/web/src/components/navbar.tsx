@@ -43,7 +43,7 @@ export function Navbar() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
             <Link href="/" className="text-xl font-bold">
-              NovaFans
+              Savage House
             </Link>
           </div>
         </div>
@@ -56,54 +56,34 @@ export function Navbar() {
       <div className="container mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
           <Link href="/" className="text-xl font-bold">
-            NovaFans
+            Savage House
           </Link>
 
           <div className="flex gap-4 items-center">
+            <Link
+              href="/browse"
+              className={`px-3 py-2 rounded ${pathname === "/browse" ? "bg-blue-100" : ""}`}
+            >
+              Browse
+            </Link>
+            <Link
+              href="/admin/scraper"
+              className={`px-3 py-2 rounded ${pathname === "/admin/scraper" ? "bg-blue-100" : ""}`}
+            >
+              Scraper
+            </Link>
             {user ? (
               <>
                 {user.role === "CREATOR" && (
-                  <>
-                    <Link
-                      href="/dashboard/creator"
-                      className={`px-3 py-2 rounded ${
-                        pathname === "/dashboard/creator" ? "bg-blue-100" : ""
-                      }`}
-                    >
-                      Dashboard
-                    </Link>
-                    <Link
-                      href="/dashboard/creator/live"
-                      className={`px-3 py-2 rounded ${
-                        pathname === "/dashboard/creator/live" ? "bg-blue-100" : ""
-                      }`}
-                    >
-                      Live
-                    </Link>
-                  </>
-                )}
-                {user.role === "FAN" && (
                   <Link
-                    href="/dashboard"
+                    href="/dashboard/creator"
                     className={`px-3 py-2 rounded ${
-                      pathname === "/dashboard" ? "bg-blue-100" : ""
+                      pathname === "/dashboard/creator" ? "bg-blue-100" : ""
                     }`}
                   >
-                    My Subscriptions
+                    Dashboard
                   </Link>
                 )}
-                <Link
-                  href="/creators"
-                  className={`px-3 py-2 rounded ${pathname === "/creators" ? "bg-blue-100" : ""}`}
-                >
-                  Creators
-                </Link>
-                <Link
-                  href="/live"
-                  className={`px-3 py-2 rounded ${pathname === "/live" ? "bg-blue-100" : ""}`}
-                >
-                  Live
-                </Link>
                 <span className="text-sm">{user.username}</span>
                 <button
                   onClick={handleLogout}
@@ -114,12 +94,6 @@ export function Navbar() {
               </>
             ) : (
               <>
-                <Link
-                  href="/creators"
-                  className={`px-3 py-2 rounded ${pathname === "/creators" ? "bg-blue-100" : ""}`}
-                >
-                  Browse
-                </Link>
                 <Link
                   href="/login"
                   className={`px-3 py-2 rounded ${pathname === "/login" ? "bg-blue-100" : ""}`}
@@ -132,34 +106,6 @@ export function Navbar() {
                 >
                   Sign Up
                 </Link>
-                {/* Creator Dropdown - Subtle */}
-                <div className="relative">
-                  <button
-                    onClick={() => setShowCreatorMenu(!showCreatorMenu)}
-                    className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
-                    onBlur={() => setTimeout(() => setShowCreatorMenu(false), 200)}
-                  >
-                    ⋯
-                  </button>
-                  {showCreatorMenu && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
-                      <Link
-                        href="/for-creators"
-                        className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg"
-                        onClick={() => setShowCreatorMenu(false)}
-                      >
-                        For Creators
-                      </Link>
-                      <Link
-                        href="/register?role=CREATOR"
-                        className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg"
-                        onClick={() => setShowCreatorMenu(false)}
-                      >
-                        Become a Creator
-                      </Link>
-                    </div>
-                  )}
-                </div>
               </>
             )}
           </div>

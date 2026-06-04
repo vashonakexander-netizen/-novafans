@@ -1,7 +1,7 @@
 import { Controller, Get } from "@nestjs/common";
 import { PrismaService } from "./common/prisma/prisma.service";
 import { RedisService } from "./common/redis/redis.service";
-import { getCryptoConfig } from "@novafans/config";
+import { getCryptoConfig } from "@savage-house/config";
 
 @Controller()
 export class AppController {
@@ -47,6 +47,16 @@ export class AppController {
     }
 
     return health;
+  }
+
+  @Get("scraper/test")
+  scraperTest() {
+    return { 
+      message: "Scraper endpoint is accessible",
+      endpoint: "/scraper/scrape",
+      method: "POST",
+      timestamp: new Date().toISOString()
+    };
   }
 }
 

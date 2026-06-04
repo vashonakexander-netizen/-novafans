@@ -7,7 +7,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
-            <h3 className="text-xl font-bold mb-4">NovaFans</h3>
+            <h3 className="text-xl font-bold mb-4">Savage House</h3>
             <p className="text-gray-600 dark:text-gray-400 text-sm">
               The ultimate platform for creators and fans.
             </p>
@@ -81,7 +81,7 @@ export function Footer() {
         </div>
 
         <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-800 text-center text-sm text-gray-600 dark:text-gray-400">
-          <p>&copy; {new Date().getFullYear()} NovaFans. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Savage House. All rights reserved.</p>
         </div>
       </div>
     </footer>

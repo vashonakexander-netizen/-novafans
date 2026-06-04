@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
-import { getStorageConfig } from "@novafans/config";
+import { getStorageConfig } from "@savage-house/config";
 import { IStorageAdapter } from "./storage-adapter.interface";
 import { LocalStorageAdapter } from "./adapters/local-storage.adapter";
 import { S3StorageAdapter } from "./adapters/s3-storage.adapter";

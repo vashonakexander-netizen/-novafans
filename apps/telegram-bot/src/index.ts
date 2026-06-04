@@ -5,36 +5,40 @@ import "dotenv/config";
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "";
 const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:3001";
 const WEB_BASE_URL = process.env.WEB_BASE_URL || "http://localhost:3000";
+/** Must match API TELEGRAM_BOT_API_SECRET for server-to-server calls */
+const TELEGRAM_BOT_API_SECRET = process.env.TELEGRAM_BOT_API_SECRET || "";
 
 if (!TELEGRAM_BOT_TOKEN) {
   console.error("TELEGRAM_BOT_TOKEN is required");
   process.exit(1);
 }
 
+if (!TELEGRAM_BOT_API_SECRET) {
+  console.warn(
+    "TELEGRAM_BOT_API_SECRET is not set — API calls to /users/telegram/* will fail until it matches the API .env"
+  );
+}
+
+const apiBotHeaders = () =>
+  TELEGRAM_BOT_API_SECRET
+    ? { "X-Telegram-Bot-Secret": TELEGRAM_BOT_API_SECRET }
+    : {};
+
 const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
 
 // Helper to get user from API
 async function getUserByTelegramChatId(chatId: string) {
   try {
-    const response = await axios.get(`${API_BASE_URL}/users/telegram/${chatId}`);
+    const response = await axios.get(`${API_BASE_URL}/users/telegram/${chatId}`, {
+      headers: apiBotHeaders(),
+    });
     return response.data;
   } catch (error) {
     return null;
   }
 }
 
-// Helper to authenticate user
-async function authenticateUser(chatId: string, userId: string) {
-  try {
-    await axios.post(`${API_BASE_URL}/users/telegram/link`, {
-      telegramChatId: chatId,
-      userId,
-    });
-    return true;
-  } catch (error) {
-    return false;
-  }
-}
+// Link Telegram chat → account: POST /users/telegram/link with JWT (from web after login).
 
 // Start command
 bot.start(async (ctx: Context) => {
@@ -73,7 +77,7 @@ bot.command("summary", async (ctx: Context) => {
   try {
     // Get analytics
     const analyticsRes = await axios.get(`${API_BASE_URL}/creators/me/analytics`, {
-      headers: { Authorization: `Bearer ${user.token}` }, // TODO: Store token securely
+      headers: { Authorization: `Bearer ${user.token}` },
     });
 
     const analytics = analyticsRes.data;

@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { AppController } from "./app.controller";
+import { AgencyModule } from "./agency/agency.module";
 import { PrismaModule } from "./common/prisma/prisma.module";
 import { RedisModule } from "./common/redis/redis.module";
 import { RateLimitModule } from "./common/rate-limit/rate-limit.module";
@@ -25,6 +26,7 @@ import { MigrationModule } from "./migration/migration.module";
 import { GrowthModule } from "./growth/growth.module";
 import { TrustModule } from "./trust/trust.module";
 import { ObservabilityModule } from "./observability/observability.module";
+import { ScraperModule } from "./scraper/scraper.module";
 
 @Module({
   imports: [
@@ -53,6 +55,8 @@ import { ObservabilityModule } from "./observability/observability.module";
     GrowthModule,
     TrustModule,
     ObservabilityModule,
+    ScraperModule,
+    AgencyModule,
   ],
   controllers: [AppController],
 })

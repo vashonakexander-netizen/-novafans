@@ -1,28 +1,21 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Navbar } from "@/components/navbar";
-import { Footer } from "@/components/footer";
 import { PageViewTracker } from "@/components/page-view-tracker";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: "NovaFans - Support Your Favorite Creators | Exclusive Content & Live Shows",
-  description: "Subscribe to exclusive content, chat directly with creators, and unlock premium experiences. Secure payments, live sessions, and direct messaging.",
+  title: "NovaFans — Creator Agency Management",
+  description: "The all-in-one platform for creator agencies.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className="flex flex-col min-h-screen">
+    <html lang="en" className="dark">
+      <body className="min-h-screen bg-background text-foreground antialiased">
         <PageViewTracker />
-        <Navbar />
-        <main className="flex-grow">{children}</main>
-        <Footer />
+        {children}
+        <Toaster />
       </body>
     </html>
   );
 }
-

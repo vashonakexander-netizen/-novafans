@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import "dotenv/config";
-import { getAiConfig } from "@novafans/config";
+import { getAiConfig } from "@savage-house/config";
 import { generateReply } from "./llm-client";
 import { buildSystemPrompt } from "./system-prompt";
 

@@ -1,8 +1,8 @@
-import { Controller, Post, Body, Param, Get, Req, Headers, UseGuards } from "@nestjs/common";
+import { Controller, Post, Body, Param, Get, Req, Headers, UseGuards, ForbiddenException } from "@nestjs/common";
 import { TransactionsService } from "./transactions.service";
 import { PrismaService } from "../common/prisma/prisma.service";
 import { CryptoGatewayService } from "../crypto-gateway/crypto-gateway.service";
-import { getCryptoConfig } from "@novafans/config";
+import { getCryptoConfig } from "@savage-house/config";
 import { IsString, IsEnum, IsNumber, IsOptional } from "class-validator";
 import { TransactionStatus } from "@prisma/client";
 
@@ -248,19 +248,28 @@ export class PaymentsController {
    * Allows developers to simulate webhook calls without hitting real gateway
    */
   @Post("crypto/test-webhook")
-  async testWebhook(@Body() body: {
-    providerStatus: "PENDING" | "PAID" | "EXPIRED" | "CANCELED" | "ERROR";
-    invoiceId: string;
-    type?: "SUBSCRIPTION" | "TIP" | "PAID_POST" | "PAID_DM";
-    amount?: number;
-    currency?: string;
-  }) {
+  async testWebhook(
+    @Body() body: {
+      providerStatus: "PENDING" | "PAID" | "EXPIRED" | "CANCELED" | "ERROR";
+      invoiceId: string;
+      type?: "SUBSCRIPTION" | "TIP" | "PAID_POST" | "PAID_DM";
+      amount?: number;
+      currency?: string;
+    },
+    @Headers("x-test-webhook-secret") secretHeader?: string
+  ) {
     const config = getCryptoConfig();
-    
-    // Only allow in development or with secret token
-    // TODO: Add proper dev-only guard or secret token check
-    if (process.env.NODE_ENV === "production" && !process.env.TEST_WEBHOOK_SECRET) {
-      return { error: "Test webhook only available in development", ok: false };
+
+    const expected = process.env.TEST_WEBHOOK_SECRET?.trim();
+    if (process.env.NODE_ENV === "production") {
+      if (!expected) {
+        throw new ForbiddenException("Test webhook disabled in production (set TEST_WEBHOOK_SECRET to enable)");
+      }
+      if (secretHeader !== expected) {
+        throw new ForbiddenException("Invalid or missing X-Test-Webhook-Secret");
+      }
+    } else if (expected && secretHeader !== expected) {
+      throw new ForbiddenException("Invalid or missing X-Test-Webhook-Secret");
     }
 
     // Build fake provider payload

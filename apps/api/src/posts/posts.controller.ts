@@ -32,6 +32,12 @@ export class PostsController {
     return this.postsService.findOne(id, user?.id);
   }
 
+  @Get()
+  @UseGuards(OptionalJwtGuard)
+  async findAll(@CurrentUser() user?: any) {
+    return this.postsService.findAll(user?.id);
+  }
+
   @Get("creators/:creatorId/posts")
   @UseGuards(OptionalJwtGuard)
   async findByCreator(@Param("creatorId") creatorId: string, @CurrentUser() user?: any) {
