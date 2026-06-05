@@ -13,32 +13,32 @@ export async function generateMetadata({
 
     if (!creator) {
       return {
-        title: "Creator Not Found | Savage House",
+        title: "Creator Not Found | NovaFans",
       };
     }
 
-    const description = creator.creatorProfile?.bio || `Subscribe to ${creator.displayName} on Savage House for exclusive content`;
+    const description = creator.creatorProfile?.bio || `Subscribe to ${creator.displayName} on NovaFans for exclusive content`;
     const imageUrl = creator.creatorProfile?.headerImageUrl || creator.creatorProfile?.avatarUrl || "";
 
     return {
-      title: `${creator.displayName} (@${creator.username}) | Savage House`,
+      title: `${creator.displayName} (@${creator.username}) | NovaFans`,
       description,
       openGraph: {
-        title: `${creator.displayName} on Savage House`,
+        title: `${creator.displayName} on NovaFans`,
         description,
         images: imageUrl ? [imageUrl] : [],
         type: "profile",
       },
       twitter: {
         card: "summary_large_image",
-        title: `${creator.displayName} on Savage House`,
+        title: `${creator.displayName} on NovaFans`,
         description,
         images: imageUrl ? [imageUrl] : [],
       },
     };
   } catch {
     return {
-      title: "Creator Profile | Savage House",
+      title: "Creator Profile | NovaFans",
     };
   }
 }

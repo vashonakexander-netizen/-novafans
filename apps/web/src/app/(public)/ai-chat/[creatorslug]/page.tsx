@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const title = `Chat with ${creator.displayName}'s AI | Savage House`;
+  const title = `Chat with ${creator.displayName}'s AI | NovaFans`;
   const description = `Preview ${creator.displayName}'s AI persona. Subscribe to chat directly with ${creator.displayName}.`;
 
   return {

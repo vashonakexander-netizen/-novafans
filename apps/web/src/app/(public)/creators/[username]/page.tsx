@@ -34,10 +34,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const title = `${creator.displayName} (@${creator.username}) | Savage House`;
+  const title = `${creator.displayName} (@${creator.username}) | NovaFans`;
   const description =
     creator.creatorProfile?.bio ||
-    `Subscribe to ${creator.displayName} on Savage House for exclusive content.`;
+    `Subscribe to ${creator.displayName} on NovaFans for exclusive content.`;
 
   return {
     title,

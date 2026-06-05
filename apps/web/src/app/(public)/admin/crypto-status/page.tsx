@@ -129,7 +129,7 @@ export default function CryptoStatusPage() {
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-purple-600 to-purple-800 text-white p-8 text-center">
-            <h1 className="text-4xl font-bold mb-2">🚀 Savage House Crypto Payment System</h1>
+            <h1 className="text-4xl font-bold mb-2">🚀 NovaFans Crypto Payment System</h1>
             <p className="text-xl opacity-90">Admin Dashboard</p>
             <div className="mt-4 inline-block bg-green-500 px-6 py-2 rounded-full font-bold">
               Status: {status.crypto.configured ? "CONFIGURED" : "NOT CONFIGURED"}

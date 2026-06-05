@@ -9,8 +9,8 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const category = decodeURIComponent(params.category);
-  const title = `Best ${category} Creators | Savage House`;
-  const description = `Discover the best ${category} creators on Savage House. Top-rated creators with exclusive content.`;
+  const title = `Best ${category} Creators | NovaFans`;
+  const description = `Discover the best ${category} creators on NovaFans. Top-rated creators with exclusive content.`;
 
   return {
     title,
@@ -37,7 +37,7 @@ export default async function BestCategoryPage({ params }: PageProps) {
             Best {category.charAt(0).toUpperCase() + category.slice(1)} Creators
           </h1>
           <p className="text-gray-400 mb-8">
-            Discover the top-rated {category} creators on Savage House. Subscribe for exclusive content
+            Discover the top-rated {category} creators on NovaFans. Subscribe for exclusive content
             and support your favorite creators.
           </p>
 

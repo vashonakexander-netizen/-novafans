@@ -8,7 +8,7 @@ export default function BillingPolicyPage() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">Payment Methods</h2>
           <p>
-            Savage House accepts payments via credit/debit cards and cryptocurrency. All payments are processed through secure third-party payment processors.
+            NovaFans accepts payments via credit/debit cards and cryptocurrency. All payments are processed through secure third-party payment processors.
           </p>
         </section>
 
@@ -22,7 +22,7 @@ export default function BillingPolicyPage() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">Platform Fees</h2>
           <p>
-            Savage House charges platform fees on transactions. Creators receive a percentage of earnings after platform fees are deducted. Current platform fee: 20% of transaction amount.
+            NovaFans charges platform fees on transactions. Creators receive a percentage of earnings after platform fees are deducted. Current platform fee: 20% of transaction amount.
           </p>
         </section>
 
@@ -56,7 +56,7 @@ export default function BillingPolicyPage() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">Taxes</h2>
           <p>
-            You are responsible for any taxes applicable to your transactions. Savage House may collect and remit taxes as required by law.
+            You are responsible for any taxes applicable to your transactions. NovaFans may collect and remit taxes as required by law.
           </p>
         </section>
 

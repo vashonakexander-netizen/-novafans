@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Pricing - Savage House | Revenue Share & Payment Methods",
+  title: "Pricing - NovaFans | Revenue Share & Payment Methods",
   description: "Competitive revenue share. No hidden fees. Get paid on your schedule. Transparent pricing for creators and fans.",
   openGraph: {
-    title: "Pricing - Savage House",
+    title: "Pricing - NovaFans",
     description: "Simple, transparent pricing. Competitive revenue share for creators.",
     type: "website",
   },

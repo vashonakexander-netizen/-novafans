@@ -8,7 +8,7 @@ export default function DMCAPage() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">Copyright Infringement Claims</h2>
           <p>
-            Savage House respects intellectual property rights and will respond to valid DMCA takedown notices.
+            NovaFans respects intellectual property rights and will respond to valid DMCA takedown notices.
           </p>
         </section>
 

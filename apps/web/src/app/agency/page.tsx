@@ -79,14 +79,35 @@ export default function AgencyDashboard() {
           {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-52 rounded-xl" />)}
         </div>
       ) : clients.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-border p-16 text-center">
-          <p className="text-muted-foreground mb-4">No clients yet. Add your first creator.</p>
-          <Link
-            href="/agency/clients"
-            className="inline-flex px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90"
-          >
-            + Add Client
-          </Link>
+        <div className="rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 p-12 text-center max-w-2xl mx-auto">
+          <div className="w-14 h-14 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto mb-5">
+            <Users className="w-7 h-7 text-primary" />
+          </div>
+          <h3 className="text-xl font-bold mb-2">Welcome to NovaFans! 👋</h3>
+          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+            Let&apos;s get you set up. Start by adding your first creator client — you can customize their tone profile, payout split, and platform links.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
+            <Link
+              href="/agency/clients"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg text-sm font-semibold hover:bg-primary/90 transition-colors"
+            >
+              <Users className="w-4 h-4" />Add Your First Client
+            </Link>
+          </div>
+          <div className="grid grid-cols-3 gap-4 mt-10 pt-8 border-t border-border text-left">
+            {[
+              { num: "1", title: "Add clients", desc: "Set up creator profiles with tone & payouts" },
+              { num: "2", title: "Upload content", desc: "Use the vault for media management" },
+              { num: "3", title: "AI handles fans", desc: "Approve AI drafts in the inbox" },
+            ].map((s) => (
+              <div key={s.num}>
+                <div className="w-7 h-7 rounded-full bg-primary/20 text-primary text-xs font-bold flex items-center justify-center mb-2">{s.num}</div>
+                <p className="text-sm font-semibold">{s.title}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{s.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
         <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5">

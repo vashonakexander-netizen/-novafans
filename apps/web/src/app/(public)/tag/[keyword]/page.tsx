@@ -10,8 +10,8 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const keyword = decodeURIComponent(params.keyword);
-  const title = `${keyword} Creators | Savage House`;
-  const description = `Discover top ${keyword} creators on Savage House. Subscribe for exclusive content and support your favorite creators.`;
+  const title = `${keyword} Creators | NovaFans`;
+  const description = `Discover top ${keyword} creators on NovaFans. Subscribe for exclusive content and support your favorite creators.`;
 
   return {
     title,

@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "For Fans - Savage House | Support Your Favorite Creators",
+  title: "For Fans - NovaFans | Support Your Favorite Creators",
   description: "Subscribe to exclusive content, chat directly with creators, and unlock premium experiences. Safe, secure, and easy to use.",
   openGraph: {
-    title: "For Fans - Savage House",
+    title: "For Fans - NovaFans",
     description: "Support your favorite creators and unlock exclusive content. Chat directly with creators.",
     type: "website",
   },
