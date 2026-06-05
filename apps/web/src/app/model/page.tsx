@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Upload, DollarSign, Image, TrendingUp } from "lucide-react";
+import { Upload, DollarSign, ImageIcon, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -57,7 +57,7 @@ export default function ModelDashboard() {
             </Card>
             <Card>
               <CardContent className="p-5">
-                <Image className="w-4 h-4 text-blue-400 mb-2" />
+                <ImageIcon className="w-4 h-4 text-blue-400 mb-2" />
                 <p className="text-xs text-muted-foreground">Uploads</p>
                 <p className="text-xl font-bold">{stats?.totalUploads ?? 0}</p>
               </CardContent>
@@ -85,6 +85,7 @@ export default function ModelDashboard() {
                 {uploads.map((item: any) => (
                   <div key={item.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
                     <div className="w-12 h-12 rounded-lg bg-muted shrink-0 overflow-hidden">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       {item.thumbnailUrl && <img src={item.thumbnailUrl} alt="" className="w-full h-full object-cover" />}
                     </div>
                     <div className="flex-1 min-w-0">

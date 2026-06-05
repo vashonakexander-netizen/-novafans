@@ -1,48 +1,28 @@
 "use client";
-
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import api from "@/lib/api";
 
-export default function DashboardPage() {
+export default function DashboardRouter() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
   useEffect(() => {
-    api
-      .get("/auth/me")
+    api.get("/auth/me")
       .then((res) => {
-        setUser(res.data);
+        const role = res.data.role;
+        if (role === "AGENCY") router.replace("/agency");
+        else if (role === "MODEL" || role === "CREATOR") router.replace("/model");
+        else if (role === "FAN") router.replace("/fan");
+        else if (role === "ADMIN") router.replace("/admin");
+        else router.replace("/login");
       })
-      .catch(() => {
-        router.push("/login");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+      .catch(() => router.replace("/login"));
   }, [router]);
-
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-16">
-        <div className="text-center">Loading...</div>
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        <p className="text-sm text-muted-foreground">Loading your dashboard...</p>
       </div>
-    );
-  }
-
-  if (!user) {
-    return null;
-  }
-
-  if (user.role === "CREATOR") {
-    router.push("/dashboard/creator");
-    return null;
-  }
-
-  // Fan dashboard
-  router.push("/dashboard/fan");
-  return null;
+    </div>
+  );
 }
-

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Zap } from "lucide-react";
@@ -13,14 +13,13 @@ import api from "@/lib/api";
 
 function roleRedirect(role: string): string {
   if (role === "AGENCY") return "/agency";
-  if (role === "MODEL") return "/model";
+  if (role === "MODEL" || role === "CREATOR") return "/model";
   if (role === "FAN") return "/fan";
-  if (role === "CREATOR") return "/dashboard/creator";
   if (role === "ADMIN") return "/admin";
   return "/dashboard";
 }
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -35,10 +34,8 @@ export default function LoginPage() {
       const res = await api.post("/auth/login", { email, password });
       const token = res.data.accessToken;
       localStorage.setItem("token", token);
-      // Set cookie for middleware role checks (30 day expiry)
       document.cookie = `token=${token}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax`;
-
-      const role = res.data.user?.role || "FAN";
+      const role = res.data.user?.role || res.data.role || "FAN";
       const redirect = searchParams.get("redirect");
       router.push(redirect || roleRedirect(role));
     } catch (err: any) {
@@ -55,14 +52,12 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="flex items-center justify-center gap-2 mb-8">
+        <Link href="/" className="flex items-center justify-center gap-2 mb-8">
           <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
             <Zap className="w-5 h-5 text-white" />
           </div>
           <span className="text-2xl font-bold">NovaFans</span>
-        </div>
-
+        </Link>
         <Card>
           <CardHeader className="text-center">
             <CardTitle>Welcome back</CardTitle>
@@ -72,26 +67,11 @@ export default function LoginPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  required
-                  autoFocus
-                />
+                <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required autoFocus />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                />
+                <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
               </div>
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? "Signing in..." : "Sign in"}
@@ -99,13 +79,23 @@ export default function LoginPage() {
             </form>
             <p className="mt-5 text-center text-sm text-muted-foreground">
               Don&apos;t have an account?{" "}
-              <Link href="/register" className="text-primary hover:underline font-medium">
-                Sign up
-              </Link>
+              <Link href="/register" className="text-primary hover:underline font-medium">Sign up</Link>
             </p>
           </CardContent>
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

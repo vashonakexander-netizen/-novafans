@@ -332,7 +332,7 @@ export default function InboxPage() {
               ) : (
                 <div className="rounded-xl border border-dashed border-border p-8 text-center">
                   <Bot className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">No draft yet. Click "Generate Draft" to create one.</p>
+                  <p className="text-sm text-muted-foreground">No draft yet. Click &ldquo;Generate Draft&rdquo; to create one.</p>
                 </div>
               )}
             </div>

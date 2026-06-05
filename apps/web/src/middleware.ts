@@ -49,7 +49,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  if (isModelRoute && role !== "MODEL" && role !== "AGENCY" && role !== "ADMIN") {
+  if (isModelRoute && role !== "MODEL" && role !== "CREATOR" && role !== "AGENCY" && role !== "ADMIN") {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 

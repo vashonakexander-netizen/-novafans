@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, notFound } from "next/navigation";
 import { Heart, Star, Crown, Lock, ShoppingBag, MessageCircle, Gift } from "lucide-react";
+
+// Reserved slugs that have their own routes — notFound() forces Next.js to 404
+const RESERVED = new Set(["api", "agency", "model", "fan", "admin", "dashboard", "login", "register", "browse", "creators", "pricing", "help", "terms", "privacy", "dmca", "live", "tag", "best", "for-creators", "for-fans"]);
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -46,6 +49,7 @@ const TIERS = [
 
 export default function ModelPage() {
   const { modelslug } = useParams<{ modelslug: string }>();
+  if (RESERVED.has(modelslug)) notFound();
   const { toast } = useToast();
   const [client, setClient] = useState<any>(null);
   const [products, setProducts] = useState<any[]>([]);

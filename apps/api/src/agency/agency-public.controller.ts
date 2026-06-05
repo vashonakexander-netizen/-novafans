@@ -5,6 +5,16 @@ import { PrismaService } from "../common/prisma/prisma.service";
 export class AgencyPublicController {
   constructor(private prisma: PrismaService) {}
 
+  @Get("creators")
+  async getAllPublicCreators() {
+    return this.prisma.agencyClient.findMany({
+      where: { status: "ACTIVE" },
+      select: { id: true, name: true, slug: true, bio: true, colorTag: true, avatarUrl: true },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    });
+  }
+
   @Get(":slug")
   async getPublicClient(@Param("slug") slug: string) {
     const client = await this.prisma.agencyClient.findFirst({
