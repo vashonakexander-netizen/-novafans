@@ -1,14 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-  LayoutDashboard, Users, DollarSign, Settings, ChevronRight,
+  LayoutDashboard, Users, DollarSign, ChevronRight, Menu, X,
   Inbox, Calendar, ImageIcon, BarChart2, LogOut, Zap
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import api from "@/lib/api";
 
@@ -34,24 +33,47 @@ const clientNav = [
 
 export function AgencySidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [clients, setClients] = useState<Client[]>([]);
-  const [activeClientId, setActiveClientId] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     api.get("/agency/clients").then((r) => setClients(r.data || [])).catch(() => {});
+    api.get("/auth/me").then((r) => setUser(r.data)).catch(() => {});
   }, []);
 
-  // Detect active client from URL
-  useEffect(() => {
-    const match = pathname.match(/\/agency\/clients\/([^/]+)/);
-    if (match) setActiveClientId(match[1]);
-  }, [pathname]);
+  // Close mobile menu on route change
+  useEffect(() => { setMobileOpen(false); }, [pathname]);
 
   const isActive = (href: string, exact = false) =>
     exact ? pathname === href : pathname.startsWith(href);
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    document.cookie = "token=; path=/; max-age=0";
+    router.push("/login");
+  };
+
   return (
-    <aside className="w-64 border-r border-border bg-card flex flex-col shrink-0">
+    <>
+      {/* Mobile toggle */}
+      <button
+        onClick={() => setMobileOpen(true)}
+        className="md:hidden fixed top-3 left-3 z-50 p-2 rounded-md bg-card border border-border text-foreground shadow-lg"
+      >
+        <Menu className="w-5 h-5" />
+      </button>
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div className="md:hidden fixed inset-0 bg-black/60 z-40" onClick={() => setMobileOpen(false)} />
+      )}
+      <aside className={cn(
+        "border-r border-border bg-card flex flex-col shrink-0 z-50",
+        "md:relative md:w-64 md:translate-x-0",
+        "fixed inset-y-0 left-0 w-64 transition-transform",
+        mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+      )}>
       {/* Logo */}
       <div className="px-4 py-5 border-b border-border">
         <Link href="/agency" className="flex items-center gap-2">
@@ -149,14 +171,21 @@ export function AgencySidebar() {
 
       {/* Footer */}
       <div className="mt-auto border-t border-border px-3 py-3">
-        <Link
-          href="/login"
-          className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+        {user && (
+          <div className="px-3 py-2 mb-1">
+            <p className="text-xs font-medium text-foreground truncate">{user.displayName || user.username}</p>
+            <p className="text-[10px] text-muted-foreground truncate">{user.email}</p>
+          </div>
+        )}
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors w-full"
         >
           <LogOut className="w-4 h-4" />
           Sign out
-        </Link>
+        </button>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }
