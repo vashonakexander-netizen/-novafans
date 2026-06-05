@@ -147,12 +147,15 @@ export default function LandingPage() {
               Start Free Trial <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
-              href="/login"
+              href="/creators"
               className="inline-flex items-center justify-center gap-2 px-8 py-3.5 border border-border rounded-lg text-base font-medium hover:bg-accent transition-colors"
             >
-              Sign In
+              See Creators
             </Link>
           </div>
+          <p className="text-xs text-muted-foreground mt-5">
+            Free to start. No credit card required.
+          </p>
 
           {/* Hero visual */}
           <div className="mt-16 relative">
