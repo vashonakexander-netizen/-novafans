@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "NovaFans — Creator Agency Management Platform",
+  title: { absolute: "NovaFans — Creator Agency Management Platform" },
   description: "The all-in-one platform for creator agencies. Manage multiple clients, AI-powered messaging, media vault, content scheduling, and fan monetization.",
 };
 
