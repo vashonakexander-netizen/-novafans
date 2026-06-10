@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Upload, DollarSign, ImageIcon, TrendingUp } from "lucide-react";
+import { Upload, DollarSign, ImageIcon, TrendingUp, Video, Sparkles } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -33,11 +33,30 @@ export default function ModelDashboard() {
         </div>
 
         {/* Upload CTA */}
-        <Link href="/model/upload" className="block mb-8">
+        <Link href="/model/upload" className="block mb-4">
           <div className="rounded-2xl border-2 border-dashed border-primary/40 p-10 text-center hover:border-primary hover:bg-primary/5 transition-colors cursor-pointer">
             <Upload className="w-10 h-10 text-primary mx-auto mb-3" />
             <p className="text-lg font-semibold text-foreground">Upload New Content</p>
             <p className="text-muted-foreground text-sm mt-1">Drop images or videos for the agency to review</p>
+          </div>
+        </Link>
+
+        {/* Clip Studio CTA */}
+        <Link href="/clip-studio" className="block mb-8">
+          <div className="rounded-2xl border-2 border-[#00ff88]/40 bg-gradient-to-br from-[#00ff88]/10 via-transparent to-transparent p-6 hover:border-[#00ff88]/70 transition-colors cursor-pointer flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-[#00ff88]/20 flex items-center justify-center shrink-0">
+              <Video className="w-6 h-6 text-[#00ff88]" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <p className="text-lg font-bold text-foreground">Clip Studio</p>
+                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#00ff88] text-black tracking-wider">NEW</span>
+              </div>
+              <p className="text-muted-foreground text-sm">
+                AI-powered YouTube → TikTok/Reels/Shorts. Earn from your content automatically.
+              </p>
+            </div>
+            <Sparkles className="w-5 h-5 text-[#00ff88] shrink-0" />
           </div>
         </Link>
 

@@ -9,6 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/for-fans`, lastModified, changeFrequency: "monthly", priority: 0.8 },
     { url: `${baseUrl}/pricing`, lastModified, changeFrequency: "monthly", priority: 0.8 },
     { url: `${baseUrl}/creators`, lastModified, changeFrequency: "daily", priority: 0.7 },
+    { url: `${baseUrl}/clip-studio`, lastModified, changeFrequency: "weekly", priority: 0.9 },
     { url: `${baseUrl}/help`, lastModified, changeFrequency: "monthly", priority: 0.5 },
     { url: `${baseUrl}/terms`, lastModified, changeFrequency: "yearly", priority: 0.3 },
     { url: `${baseUrl}/privacy`, lastModified, changeFrequency: "yearly", priority: 0.3 },

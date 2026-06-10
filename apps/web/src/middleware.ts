@@ -16,15 +16,18 @@ function decodeJWT(token: string): { role?: string } | null {
 const AGENCY_ROUTES = ["/agency"];
 const MODEL_ROUTES = ["/model"];
 const FAN_ROUTES = ["/fan"];
+// Clip Studio dashboard requires auth (but promo page /clip-studio is public)
+const CLIP_STUDIO_AUTH_ROUTES = ["/clip-studio/dashboard", "/clip-studio/clips"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isAgencyRoute = AGENCY_ROUTES.some((r) => pathname.startsWith(r));
   const isModelRoute = MODEL_ROUTES.some((r) => pathname.startsWith(r));
+  const isClipStudioAuthRoute = CLIP_STUDIO_AUTH_ROUTES.some((r) => pathname.startsWith(r));
   const isFanRoute = FAN_ROUTES.some((r) => pathname.startsWith(r));
 
-  if (!isAgencyRoute && !isModelRoute && !isFanRoute) {
+  if (!isAgencyRoute && !isModelRoute && !isFanRoute && !isClipStudioAuthRoute) {
     return NextResponse.next();
   }
 
@@ -57,9 +60,20 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
+  // Clip Studio dashboard: open to AGENCY, MODEL, CREATOR, ADMIN
+  if (isClipStudioAuthRoute && role !== "AGENCY" && role !== "MODEL" && role !== "CREATOR" && role !== "ADMIN") {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/agency/:path*", "/model/:path*", "/fan/:path*"],
+  matcher: [
+    "/agency/:path*",
+    "/model/:path*",
+    "/fan/:path*",
+    "/clip-studio/dashboard/:path*",
+    "/clip-studio/clips/:path*",
+  ],
 };

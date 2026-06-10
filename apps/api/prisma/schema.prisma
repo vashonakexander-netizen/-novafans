@@ -175,6 +175,11 @@ model User {
   mediaUploads    AgencyMediaVault[]      @relation("MediaUploads")
   agencyTemplates AgencyResponseTemplate[] @relation("AgencyTemplates")
   agencyFans      AgencyFan[]             @relation("AgencyFans")
+  clipChannels    ClipChannel[]           @relation("ClipChannels")
+  clipClips       Clip[]                  @relation("ClipClips")
+  clipPosts       ClipPost[]              @relation("ClipPosts")
+  clipSocials     ClipSocialAccount[]     @relation("ClipSocialAccounts")
+  clipEarnings    ClipEarning[]           @relation("ClipEarnings")
 
   @@index([username])
   @@index([email])
@@ -834,4 +839,138 @@ model AgencyAnalyticsEvent {
   @@index([clientId])
   @@index([eventType])
   @@index([createdAt])
+}
+
+// ─── Clip Studio Module ─────────────────────────────────────────────────────
+
+enum ClipChannelStatus {
+  INDEXING
+  ACTIVE
+  PAUSED
+  ERROR
+}
+
+enum ClipStatus {
+  PROCESSING
+  READY
+  POSTED
+  FAILED
+}
+
+enum ClipPlatform {
+  TIKTOK
+  INSTAGRAM
+  YOUTUBE_SHORTS
+  YOUTUBE
+}
+
+enum ClipPostStatus {
+  QUEUED
+  POSTED
+  FAILED
+}
+
+model ClipChannel {
+  id                  String            @id @default(cuid())
+  userId              String
+  youtubeChannelUrl   String
+  channelName         String?
+  channelThumbnail    String?
+  status              ClipChannelStatus @default(INDEXING)
+  totalVideosIndexed  Int               @default(0)
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  user                User              @relation("ClipChannels", fields: [userId], references: [id], onDelete: Cascade)
+  clips               Clip[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model Clip {
+  id                    String      @id @default(cuid())
+  channelId             String
+  userId                String
+  sourceVideoUrl        String
+  sourceVideoTitle      String?
+  clipTitle             String?
+  clipStartSeconds      Int?
+  clipEndSeconds        Int?
+  clipDurationSeconds   Int?
+  storagePath           String?
+  publicUrl             String?
+  thumbnailUrl          String?
+  viralScore            Int         @default(0)
+  status                ClipStatus  @default(PROCESSING)
+  reason                String?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  channel               ClipChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  user                  User        @relation("ClipClips", fields: [userId], references: [id], onDelete: Cascade)
+  posts                 ClipPost[]
+  earnings              ClipEarning[]
+
+  @@index([channelId])
+  @@index([userId])
+  @@index([status])
+  @@index([viralScore])
+}
+
+model ClipPost {
+  id              String         @id @default(cuid())
+  clipId          String
+  userId          String
+  platform        ClipPlatform
+  postStatus      ClipPostStatus @default(QUEUED)
+  externalPostId  String?
+  externalUrl     String?
+  views           Int            @default(0)
+  likes           Int            @default(0)
+  postedAt        DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  clip            Clip           @relation(fields: [clipId], references: [id], onDelete: Cascade)
+  user            User           @relation("ClipPosts", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([clipId])
+  @@index([userId])
+  @@index([platform])
+  @@index([postStatus])
+}
+
+model ClipSocialAccount {
+  id                String        @id @default(cuid())
+  userId            String
+  platform          ClipPlatform
+  accountUsername   String?
+  accessToken       String?
+  refreshToken      String?
+  tokenExpiry       DateTime?
+  connectedAt       DateTime      @default(now())
+
+  user              User          @relation("ClipSocialAccounts", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, platform])
+  @@index([userId])
+}
+
+model ClipEarning {
+  id          String       @id @default(cuid())
+  clipId      String
+  userId      String
+  platform    ClipPlatform?
+  totalViews  Int          @default(0)
+  earningsUsd Decimal      @default(0) @db.Decimal(10, 4)
+  ratePer1k   Decimal      @default(1.00) @db.Decimal(6, 4)
+  recordedAt  DateTime     @default(now())
+
+  clip        Clip         @relation(fields: [clipId], references: [id], onDelete: Cascade)
+  user        User         @relation("ClipEarnings", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([clipId])
+  @@index([userId])
+  @@index([platform])
 }

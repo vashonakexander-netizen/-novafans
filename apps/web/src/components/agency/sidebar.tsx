@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   LayoutDashboard, Users, DollarSign, ChevronRight, Menu, X,
-  Inbox, Calendar, ImageIcon, BarChart2, LogOut, Zap
+  Inbox, Calendar, ImageIcon, BarChart2, LogOut, Zap, Video
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +22,7 @@ const navItems = [
   { href: "/agency", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/agency/clients", label: "Clients", icon: Users },
   { href: "/agency/revenue", label: "Revenue", icon: DollarSign },
+  { href: "/clip-studio/dashboard", label: "Clip Studio", icon: Video, badge: "NEW" },
 ];
 
 const clientNav = [
@@ -99,7 +100,12 @@ export function AgencySidebar() {
             )}
           >
             <item.icon className="w-4 h-4 shrink-0" />
-            {item.label}
+            <span className="flex-1">{item.label}</span>
+            {(item as any).badge && (
+              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#00ff88] text-black tracking-wider">
+                {(item as any).badge}
+              </span>
+            )}
           </Link>
         ))}
       </nav>

@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AgencyModule } from "./agency/agency.module";
+import { ClipStudioModule } from "./clip-studio/clip-studio.module";
 import { PrismaModule } from "./common/prisma/prisma.module";
 import { RedisModule } from "./common/redis/redis.module";
 import { RateLimitModule } from "./common/rate-limit/rate-limit.module";
@@ -57,6 +58,7 @@ import { ScraperModule } from "./scraper/scraper.module";
     ObservabilityModule,
     ScraperModule,
     AgencyModule,
+    ClipStudioModule,
   ],
   controllers: [AppController],
 })
